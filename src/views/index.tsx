@@ -3,7 +3,7 @@ import { WebviewApi, WithWebviewContext } from "./WebviewContext";
 import { Sidebar } from "./Sidebar";
 
 export const Views = {
-  raiderChat: Sidebar,
+  police: Sidebar,
 } as const;
 
 export type ViewKey = keyof typeof Views;

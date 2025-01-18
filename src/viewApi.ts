@@ -23,14 +23,6 @@ export type ViewApiEvent<K extends keyof ViewEvents = keyof ViewEvents> = {
   value: Parameters<ViewEvents[K]>;
 };
 
-export type ViewApi = {
-  navigateTo: (
-    page: "chat" | "history" | "codebases" | "settings" | "search"
-  ) => void;
-};
+export type ViewApi = {};
 
-export type ViewEvents = {
-  showPage: (
-    page: "chat" | "history" | "codebases" | "settings" | "search"
-  ) => void;
-};
+export type ViewEvents = {};

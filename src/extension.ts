@@ -13,8 +13,6 @@ import {
 export const activate = async (ctx: vscode.ExtensionContext) => {
   const connectedViews: Partial<Record<ViewKey, vscode.WebviewView>> = {};
 
-  let currentPage = "chat";
-
   const triggerEvent = <E extends keyof ViewEvents>(
     key: E,
     ...params: Parameters<ViewEvents[E]>
@@ -28,14 +26,7 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     });
   };
 
-  const api: ViewApi = {
-    navigateTo: (
-      page: "chat" | "history" | "codebases" | "settings" | "search"
-    ) => {
-      triggerEvent("showPage", page);
-      currentPage = page;
-    },
-  };
+  const api: ViewApi = {};
 
   const isViewApiRequest = <K extends keyof ViewApi>(
     msg: unknown
@@ -60,7 +51,6 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
           type: "response",
           id: msg.id,
           value: val,
-          isStreaming: false,
         };
         view.webview.postMessage(res);
       } catch (e: unknown) {
@@ -77,17 +67,7 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     view.webview.onDidReceiveMessage(onMessage);
   };
 
-  registerAndConnectView("raiderChat");
-
-  type Page = "chat" | "history" | "codebases" | "settings" | "search";
-
-  let pages: Page[] = ["chat", "history", "codebases", "settings"];
-
-  pages.forEach((page) => {
-    vscode.commands.registerCommand(`raider.${page}`, () => {
-      console.log(`raider.${page} called`);
-    });
-  });
+  registerAndConnectView("police");
 };
 
 export const deactivate = () => {

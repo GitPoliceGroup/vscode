@@ -55,16 +55,16 @@
         {
           "id": "police",
           "title": "Git Police",
-          "icon": "static/logo.svg"
+          "icon": "static/police.svg"
         }
       ]
     },
     "views": {
-      "raider": [
+      "police": [
         {
           "id": "police",
           "type": "webview",
-          "name": "Chat"
+          "name": "Git Police"
         }
       ]
     }
