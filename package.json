@@ -1,8 +1,8 @@
 {
-  "name": "raider-chat",
+  "name": "git-police",
   "private": true,
-  "displayName": "Raider Chat",
-  "description": "Raid repos for code!",
+  "displayName": "Git Police",
+  "description": "Make your commits more interesting",
   "version": "1.0.1",
   "engines": {
     "vscode": "^1.92.0"
@@ -30,7 +30,6 @@
     "@types/react-dom": "^18.2.13",
     "@types/uuid": "^9.0.5",
     "@types/vscode": "^1.83.1",
-    "@types/ws": "^8.5.12",
     "@vscode/vsce": "^2.21.1",
     "copy-webpack-plugin": "^11.0.0",
     "prettier": "^3.0.3",
@@ -45,110 +44,27 @@
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
-    "@fontsource-variable/inter": "^5.0.21",
-    "@fontsource/roboto": "^5.1.0",
-    "@mui/icons-material": "^5.16.7",
-    "@mui/material": "^5.16.7",
-    "@mui/styled-engine-sc": "^6.1.1",
-    "@shikijs/markdown-it": "^1.21.1",
-    "axios": "^1.7.4",
-    "bufferutil": "^4.0.8",
-    "highlight.js": "^11.10.0",
-    "markdown-it": "^14.1.0",
-    "marked": "^14.1.2",
     "raider-chat": "file:",
     "react-icons": "^5.3.0",
     "shiki": "^1.21.1",
-    "styled-components": "^6.1.13",
-    "utf-8-validate": "^6.0.4",
-    "ws": "^8.18.0"
+    "utf-8-validate": "^6.0.4"
   },
   "contributes": {
-    "commands": [
-      {
-        "command": "raider.new",
-        "title": "New Session",
-        "category": "Raider",
-        "icon": "$(plus)",
-        "group": "Raider"
-      },
-      {
-        "command": "raider.chat",
-        "title": "View Chat",
-        "category": "Raider",
-        "icon": "$(comment-discussion)",
-        "group": "Raider"
-      },
-      {
-        "command": "raider.history",
-        "title": "View Session History",
-        "category": "Raider",
-        "icon": "$(history)",
-        "group": "Raider"
-      },
-      {
-        "command": "raider.codebases",
-        "title": "View Codebases",
-        "category": "Raider",
-        "icon": "$(repo)",
-        "group": "Raider"
-      },
-      {
-        "command": "raider.settings",
-        "title": "View Settings",
-        "category": "Raider",
-        "icon": "$(settings-gear)",
-        "group": "Raider"
-      }
-    ],
-    "menus": {
-      "view/title": [
-        {
-          "command": "raider.new",
-          "group": "navigation@1",
-          "when": "(workspaceFolderCount == 1) && (view == raiderChat)"
-        },
-        {
-          "command": "raider.chat",
-          "group": "navigation@1",
-          "when": "(workspaceFolderCount == 1) && (view == raiderChat)"
-        },
-        {
-          "command": "raider.history",
-          "group": "navigation@1",
-          "when": "(workspaceFolderCount == 1) && (view == raiderChat)"
-        },
-        {
-          "command": "raider.codebases",
-          "group": "navigation@1",
-          "when": "(workspaceFolderCount == 1) && (view == raiderChat)"
-        },
-        {
-          "command": "raider.settings",
-          "group": "navigation@1",
-          "when": "(workspaceFolderCount == 1) && (view == raiderChat)"
-        }
-      ]
-    },
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "raider",
-          "title": "Raider",
-          "icon": "static/logo.svg",
-          "when": "workspaceFolderCount == 1"
+          "id": "police",
+          "title": "Git Police",
+          "icon": "static/logo.svg"
         }
       ]
     },
     "views": {
       "raider": [
         {
-          "id": "raiderChat",
+          "id": "police",
           "type": "webview",
-          "name": "Chat",
-          "when": "workspaceFolderCount == 1"
+          "name": "Chat"
         }
       ]
     }

@@ -1,13 +1,9 @@
 import { createRoot } from "react-dom/client";
 import { WebviewApi, WithWebviewContext } from "./WebviewContext";
 import { Sidebar } from "./Sidebar";
-// import { Terminal } from "./Terminal";
-import ThemeProvider from "@mui/material/styles/ThemeProvider";
-import { theme } from "./theme/theme";
 
 export const Views = {
   raiderChat: Sidebar,
-  // raiderTerminal: Terminal,
 } as const;
 
 export type ViewKey = keyof typeof Views;
@@ -31,9 +27,7 @@ export function render<V extends ViewKey>(
 
   root.render(
     <WithWebviewContext vscodeApi={vscodeApi}>
-      <ThemeProvider theme={theme}>
-        <Component />
-      </ThemeProvider>
+      <Component />
     </WithWebviewContext>
   );
 }
