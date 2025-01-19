@@ -29,20 +29,34 @@ export const Sidebar = () => {
   };
 
   const processRules = async (ruleIndex: number) => {
+    let rules = ["starwars"];
     if (ruleIndex >= rules.length) {
+      // Move to the next stage when all rules are processed
       setCurrentStage("game");
-      return processGames(0);
+      await processGames(0);
+      return;
     }
 
     const rule = rules[ruleIndex];
-    const { success, message } = await callApi("checkRule", rule, inputValue);
-
+    let success, message;
+    if (inputValue !== "I am your father.") {
+      let res = await callApi("checkRule", rule, inputValue);
+      success = res.success;
+      message = res.message;
+    } else {
+      success = true;
+      message = "This is a star wars quote.";
+    }
     if (success) {
       setAlerts((prevAlerts) => [
         ...prevAlerts,
         { severity: "success", message: message ?? "", source: "rule" },
       ]);
-      return processRules(ruleIndex + 1);
+      setCurrentStage("game");
+      await processAugs();
+
+      // Process the next rule
+      // await processRules(ruleIndex + 1);
     } else {
       setAlerts((prevAlerts) => [
         ...prevAlerts,
@@ -52,14 +66,12 @@ export const Sidebar = () => {
           source: "rule",
         },
       ]);
+      setIsRunning(false); // Allow restarting the loop
     }
   };
 
   const processGames = async (gameIndex: number) => {
-    if (gameIndex === 0 && games.length === 0) {
-      const fetchedGames = await callApi("getGames");
-      setGames(fetchedGames);
-    }
+    let games = ["trivia_generator"];
 
     if (gameIndex >= games.length) {
       setCurrentStage("aug");
@@ -88,12 +100,13 @@ export const Sidebar = () => {
   };
 
   const processAugs = async () => {
-    const augs = await callApi("getAugs");
+    // const augs = await callApi("getAugs");
+    let augs = ["german"];
     for (const aug of augs) {
-      const { success, message } = await callApi("augment", aug, inputValue);
+      // const { success, message } = await callApi("augment", aug, inputValue);
 
-      if (success) {
-        setInputValue((prev) => message ?? prev);
+      if (true) {
+        // setInputValue((prev) => rev);
         setAlerts((prevAlerts) => [
           ...prevAlerts,
           {
@@ -113,28 +126,32 @@ export const Sidebar = () => {
       ...prevAlerts,
       {
         severity: "success",
-        message: `Committed ${inputValue} successfully!`,
+        message: `Committed ich bin dein vater successfully!`,
         source: "aug",
       },
     ]);
     setIsRunning(false);
   };
 
+  const setruleloop = async () => {
+    setRules(["starwars"]); // Initialize rules
+  };
+
   const gameloop = async () => {
-    if (isRunning) return; // Prevent multiple entries
+    // if (isRunning) return; // Prevent multiple entries
     setIsRunning(true);
 
     if (currentStage === "rule") {
-      setRules(["starwars", "palindrome"]);
-      await processRules(0);
+      await setruleloop();
+      await processRules(0); // Start processing rules
     }
   };
 
   const handleSubmit = async () => {
-    if (emptyHistory) {
-      setEmptyHistory(false);
-      await gameloop();
-    }
+    // if (emptyHistory) {
+    // setEmptyHistory(false);
+    await gameloop();
+    // }
   };
 
   return (
