@@ -35,36 +35,36 @@ export const Sidebar = () => {
 
   const gameloop = async () => {
     if (currentStage === "rule") {
-      if (currentRuleIndex == -1) {
-        setRules(["starwars", "palindrome"]);
-        setCurrentRuleIndex(0);
-      } else {
-        while (currentRuleIndex < rules.length) {
-          let { success, message } = await callApi(
-            "checkRule",
-            rules[Math.max(currentRuleIndex, 0)] ??
-              `fuck${typeof currentRuleIndex}${rules}`,
-            inputValue
-          );
-          if (success) {
-            setAlerts([
-              ...alerts,
-              { severity: "success", message: message ?? "", source: "rule" },
-            ]);
-            setCurrentRuleIndex(currentRuleIndex + 1);
-          } else {
-            setAlerts([
-              ...alerts,
-              {
-                severity: "error",
-                message: `${message}\n\nPlease resubmit.`,
-                source: "rule",
-              },
-            ]);
-            return;
-          }
+      while (currentRuleIndex < rules.length) {
+        if (currentRuleIndex == -1) {
+          setRules(["starwars", "palindrome"]);
+          setCurrentRuleIndex(0);
+        }
+        let { success, message } = await callApi(
+          "checkRule",
+          rules[Math.max(currentRuleIndex, 0)] ??
+            `fuck${typeof currentRuleIndex}${rules}`,
+          inputValue
+        );
+        if (success) {
+          setAlerts([
+            ...alerts,
+            { severity: "success", message: message ?? "", source: "rule" },
+          ]);
+          setCurrentRuleIndex(currentRuleIndex + 1);
+        } else {
+          setAlerts([
+            ...alerts,
+            {
+              severity: "error",
+              message: `${message}\n\nPlease resubmit.`,
+              source: "rule",
+            },
+          ]);
+          return;
         }
       }
+
       setCurrentStage("game");
       gameloop();
     } else if (currentStage === "game") {
