@@ -23,6 +23,22 @@ export type ViewApiEvent<K extends keyof ViewEvents = keyof ViewEvents> = {
   value: Parameters<ViewEvents[K]>;
 };
 
-export type ViewApi = {};
+export type ViewApi = {
+  getRules(): Promise<string[]>;
+  checkRule(
+    rule: string,
+    message: string
+  ): Promise<{ success: boolean; message: string | undefined }>;
+  getGames(): Promise<string[]>;
+  playGame(
+    game: string
+  ): Promise<{ success: boolean; message: string | undefined }>;
+  getAugs(): Promise<string[]>;
+  augment(
+    aug: string,
+    message: string
+  ): Promise<{ success: boolean; message: string | undefined }>;
+  emotion(): Promise<void>;
+};
 
 export type ViewEvents = {};

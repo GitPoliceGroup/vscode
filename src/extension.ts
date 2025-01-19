@@ -9,9 +9,12 @@ import {
   ViewApiResponse,
   ViewEvents,
 } from "./viewApi";
+import { Backend } from "./backendApi";
 
 export const activate = async (ctx: vscode.ExtensionContext) => {
   const connectedViews: Partial<Record<ViewKey, vscode.WebviewView>> = {};
+
+  const backend = new Backend();
 
   const triggerEvent = <E extends keyof ViewEvents>(
     key: E,
@@ -26,7 +29,36 @@ export const activate = async (ctx: vscode.ExtensionContext) => {
     });
   };
 
-  const api: ViewApi = {};
+  const api: ViewApi = {
+    getRules() {
+      return backend.getRules();
+    },
+
+    checkRule(rule: string, message: string) {
+      console.log("checking rule", rule, message);
+      return backend.checkRule(rule, message);
+    },
+
+    getGames() {
+      return backend.getGames();
+    },
+
+    playGame(game: string) {
+      return backend.playGame(game);
+    },
+
+    getAugs() {
+      return backend.getAugs();
+    },
+
+    augment(aug: string, message: string) {
+      return backend.augment(aug, message);
+    },
+
+    emotion() {
+      return backend.emotion();
+    },
+  };
 
   const isViewApiRequest = <K extends keyof ViewApi>(
     msg: unknown

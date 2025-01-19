@@ -11,6 +11,11 @@
       "functionBind": false,
       "decorators": true,
       "dynamicImport": true
+    },
+    "transform": {
+      "react": {
+        "runtime": "automatic" // Or "classic" if you're not using React 17+
+      }
     }
   }
 }
