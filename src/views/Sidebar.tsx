@@ -5,7 +5,7 @@ import Alert from "@mui/material/Alert";
 import { WebviewContext } from "./WebviewContext";
 
 export const Sidebar = () => {
-  let { callApi } = useContext(WebviewContext);
+  const { callApi } = useContext(WebviewContext);
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState(false);
 
@@ -18,123 +18,122 @@ export const Sidebar = () => {
     { severity: string; message: string; source: "rule" | "game" | "aug" }[]
   >([]);
   const [rules, setRules] = useState<string[]>([]);
-  const [currentRuleIndex, setCurrentRuleIndex] = useState(-1);
   const [games, setGames] = useState<string[]>([]);
-  const [currentGameIndex, setCurrentGameIndex] = useState(-1);
+  const [isRunning, setIsRunning] = useState(false); // Prevent re-entry into gameloop
 
   const handleChange = (event: any) => {
     const value = event.target.value;
     setInputValue(value);
 
-    if (value.length <= 3) {
-      setError(true);
+    setError(value.length <= 3);
+  };
+
+  const processRules = async (ruleIndex: number) => {
+    if (ruleIndex >= rules.length) {
+      setCurrentStage("game");
+      return processGames(0);
+    }
+
+    const rule = rules[ruleIndex];
+    const { success, message } = await callApi("checkRule", rule, inputValue);
+
+    if (success) {
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { severity: "success", message: message ?? "", source: "rule" },
+      ]);
+      return processRules(ruleIndex + 1);
     } else {
-      setError(false);
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        {
+          severity: "error",
+          message: `${message}\n\nPlease resubmit.`,
+          source: "rule",
+        },
+      ]);
     }
   };
 
-  const gameloop = async () => {
-    if (currentStage === "rule") {
-      while (currentRuleIndex < rules.length) {
-        if (currentRuleIndex == -1) {
-          setRules(["starwars", "palindrome"]);
-          setCurrentRuleIndex(0);
-        }
-        let { success, message } = await callApi(
-          "checkRule",
-          rules[Math.max(currentRuleIndex, 0)] ??
-            `fuck${typeof currentRuleIndex}${rules}`,
-          inputValue
-        );
-        if (success) {
-          setAlerts([
-            ...alerts,
-            { severity: "success", message: message ?? "", source: "rule" },
-          ]);
-          setCurrentRuleIndex(currentRuleIndex + 1);
-        } else {
-          setAlerts([
-            ...alerts,
-            {
-              severity: "error",
-              message: `${message}\n\nPlease resubmit.`,
-              source: "rule",
-            },
-          ]);
-          return;
-        }
-      }
+  const processGames = async (gameIndex: number) => {
+    if (gameIndex === 0 && games.length === 0) {
+      const fetchedGames = await callApi("getGames");
+      setGames(fetchedGames);
+    }
 
-      setCurrentStage("game");
-      gameloop();
-    } else if (currentStage === "game") {
-      if (currentGameIndex === -1) {
-        setGames(await callApi("getGames"));
-        setCurrentGameIndex(0);
-      }
-      while (currentGameIndex < games.length) {
-        let { success, message } = await callApi(
-          "playGame",
-          games[currentGameIndex]
-        );
-        if (success) {
-          setAlerts([
-            ...alerts,
-            { severity: "success", message: message ?? "", source: "game" },
-          ]);
-          setCurrentGameIndex(currentGameIndex + 1);
-        } else {
-          setAlerts([
-            ...alerts,
-            {
-              severity: "error",
-              message: `${message}\n\nPlease resubmit.`,
-              source: "game",
-            },
-          ]);
-          return;
-        }
-      }
+    if (gameIndex >= games.length) {
       setCurrentStage("aug");
-      gameloop();
-    } else if (currentStage === "aug") {
-      let augs = await callApi("getAugs");
-      for (let aug in augs) {
-        let { success, message } = await callApi("augment", aug, inputValue);
-        if (success) {
-          setInputValue(message ?? inputValue);
-          setAlerts([
-            ...alerts,
-            {
-              severity: "success",
-              message: "Modified Commit Message for fun",
-              source: "aug",
-            },
-          ]);
-        }
-      }
+      return processAugs();
+    }
 
-      setCurrentStage("rule");
-      setRules([]);
-      setCurrentRuleIndex(-1);
-      setGames([]);
-      setCurrentGameIndex(-1);
-      setEmptyHistory(true);
-      setAlerts([
-        ...alerts,
+    const game = games[gameIndex];
+    const { success, message } = await callApi("playGame", game);
+
+    if (success) {
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
+        { severity: "success", message: message ?? "", source: "game" },
+      ]);
+      return processGames(gameIndex + 1);
+    } else {
+      setAlerts((prevAlerts) => [
+        ...prevAlerts,
         {
-          severity: "success",
-          message: `Committed ${inputValue} successfully!`,
-          source: "aug",
+          severity: "error",
+          message: `${message}\n\nPlease resubmit.`,
+          source: "game",
         },
       ]);
+    }
+  };
+
+  const processAugs = async () => {
+    const augs = await callApi("getAugs");
+    for (const aug of augs) {
+      const { success, message } = await callApi("augment", aug, inputValue);
+
+      if (success) {
+        setInputValue((prev) => message ?? prev);
+        setAlerts((prevAlerts) => [
+          ...prevAlerts,
+          {
+            severity: "success",
+            message: "Modified Commit Message for fun",
+            source: "aug",
+          },
+        ]);
+      }
+    }
+
+    setCurrentStage("rule");
+    setRules([]);
+    setGames([]);
+    setEmptyHistory(true);
+    setAlerts((prevAlerts) => [
+      ...prevAlerts,
+      {
+        severity: "success",
+        message: `Committed ${inputValue} successfully!`,
+        source: "aug",
+      },
+    ]);
+    setIsRunning(false);
+  };
+
+  const gameloop = async () => {
+    if (isRunning) return; // Prevent multiple entries
+    setIsRunning(true);
+
+    if (currentStage === "rule") {
+      setRules(["starwars", "palindrome"]);
+      await processRules(0);
     }
   };
 
   const handleSubmit = async () => {
     if (emptyHistory) {
       setEmptyHistory(false);
-      gameloop();
+      await gameloop();
     }
   };
 
@@ -154,7 +153,6 @@ export const Sidebar = () => {
         textColor: "white",
       }}
     >
-      {/* Input and Button */}
       <Box sx={{ width: "100%" }}>
         <TextField
           label="Commit Message"
